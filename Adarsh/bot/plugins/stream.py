@@ -133,7 +133,7 @@ async def private_receive_handler(c: Client, m: Message):
                                                 InlineKeyboardButton('⚡ ᴅᴏᴡɴʟᴏᴀᴅ ⚡', url=online_link)]]) #Download Link
         )
         WAIT_LIST.update({str(USER_ID): True})
-        await asyncio.sleep(WAIT_TIME)
+        await asyncio.sleep(Var.WAIT_TIME)
         WAIT_LIST.update({str(USER_ID): False})
     except FloodWait as e:
         print(f"Sleeping for {str(e.x)}s")
