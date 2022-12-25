@@ -51,7 +51,7 @@ async def private_receive_handler(c: Client, m: Message):
     USER_ID = m.from_user.id
     try:
         if USER_ID not in Var.PREMIUM_USERS and WAIT_LIST[USER_ID] == True:
-            return await m.reply_text(f"<b>Hey {m.from_user.mention}, Wait for {str(Var.WAIT_TIME)} seconds to use me !</b>")
+            return await m.reply_text(f"<b>Hey {m.from_user.mention}, Wait for {str(Var.WAIT_TIME)} seconds to use me ! \n\nYou are a free user, if you need to get highspeed downloading links, you need to take premium subscription.\n\nPay ₹30/- to @kwic2002 in telegram.</b>")
         else:
             pass
     except KeyError:
