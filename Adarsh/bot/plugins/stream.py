@@ -52,10 +52,8 @@ async def private_receive_handler(c: Client, m: Message):
     try:
         if USER_ID not in Var.PREMIUM_USERS and WAIT_LIST[USER_ID] == True:
             return await m.reply_text(f"<b>Hey {m.from_user.mention}, Wait for {str(Var.WAIT_TIME)} seconds to use me ! \n\nYou are a free user, if you need to get highspeed downloading links, you need to take premium subscription.\n\nPay ₹30/- to the UPI ID sharundas123@ybl and send a screenshot to @kwicadmin in telegram.</b>")
-        else:
-            pass
     except KeyError:
-        WAIT_LIST.update({str(USER_ID): False})
+        WAIT_LIST[str(USER_ID)] = False
     if MY_PASS:
         check_pass = await pass_db.get_user_pass(m.chat.id)
         if check_pass== None:
@@ -132,9 +130,9 @@ async def private_receive_handler(c: Client, m: Message):
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("⚡ ᴡᴀᴛᴄʜ ⚡", url=stream_link), #Stream Link
                                                 InlineKeyboardButton('⚡ ᴅᴏᴡɴʟᴏᴀᴅ ⚡', url=online_link)]]) #Download Link
         )
-        WAIT_LIST.update({str(USER_ID): True})
+        WAIT_LIST[str(USER_ID)] = True
         await asyncio.sleep(Var.WAIT_TIME)
-        WAIT_LIST.update({str(USER_ID): False})
+        WAIT_LIST[str(USER_ID)] = False
     except FloodWait as e:
         print(f"Sleeping for {str(e.x)}s")
         await asyncio.sleep(e.x)
