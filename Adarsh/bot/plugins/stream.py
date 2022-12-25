@@ -133,9 +133,10 @@ async def private_receive_handler(c: Client, m: Message):
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("⚡ ᴡᴀᴛᴄʜ ⚡", url=stream_link), #Stream Link
                                                 InlineKeyboardButton('⚡ ᴅᴏᴡɴʟᴏᴀᴅ ⚡', url=online_link)]]) #Download Link
         )
-        WAIT_LIST[USER_ID] = True
-        await asyncio.sleep(Var.WAIT_TIME)
-        WAIT_LIST[USER_ID] = False
+        if USER_ID not in Var.PREMIUM_USERS:
+            WAIT_LIST[USER_ID] = True
+            await asyncio.sleep(Var.WAIT_TIME)
+            WAIT_LIST[USER_ID] = False
     except FloodWait as e:
         print(f"Sleeping for {str(e.x)}s")
         await asyncio.sleep(e.x)
