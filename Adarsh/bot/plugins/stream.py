@@ -49,12 +49,14 @@ async def login_handler(c: Client, m: Message):
 @StreamBot.on_message((filters.private) & (filters.document | filters.video | filters.audio | filters.photo) , group=4)
 async def private_receive_handler(c: Client, m: Message):
     USER_ID = m.chat.id
-    try:
+    key = USER_ID
+    if key in WAIT_LIST.keys():
         ISWAIT = WAIT_LIST.get(USER_ID)
-        if USER_ID not in Var.PREMIUM_USERS and ISWAIT == True:
-            return await m.reply_text(f"<b>Hey {m.from_user.mention}, Wait for {str(Var.WAIT_TIME)} seconds to use me ! \n\nYou are a free user, if you need to get highspeed downloading links, you need to take premium subscription.\n\nPay ₹30/- to the UPI ID sharundas123@ybl and send a screenshot to @kwicadmin in telegram.</b>")
-    except KeyError:
+    else:
         WAIT_LIST[USER_ID] = False
+        ISWAIT = WAIT_LIST.get(USER_ID)
+    if USER_ID not in Var.PREMIUM_USERS and ISWAIT == True:
+        return await m.reply_text(f"<b>Hey {m.from_user.mention}, Wait for {str(Var.WAIT_TIME)} seconds to use me ! \n\nYou are a free user, if you need to get highspeed downloading links, you need to take premium subscription.\n\nPay ₹30/- to the UPI ID sharundas123@ybl and send a screenshot to @kwicadmin in telegram.</b>")
     if MY_PASS:
         check_pass = await pass_db.get_user_pass(m.chat.id)
         if check_pass== None:
