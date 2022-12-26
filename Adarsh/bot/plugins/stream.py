@@ -1,9 +1,11 @@
 #(c) Adarsh-Goel
 import os
 import asyncio
+import pytz
 from asyncio import TimeoutError
 from Adarsh.bot import StreamBot
 from Adarsh.utils.database import Database
+from datetime import date
 from Adarsh.utils.human_readable import humanbytes
 from Adarsh.vars import Var
 from urllib.parse import quote_plus
@@ -18,7 +20,9 @@ db = Database(Var.DATABASE_URL, Var.name)
 MY_PASS = os.environ.get("MY_PASS",None)
 pass_dict = {}
 pass_db = Database(Var.DATABASE_URL, "ag_passwords")
-WAIT_LIST = {}
+FREE_USER = {}
+DAILY_LIMIT = 0
+
 
 
 @StreamBot.on_message((filters.regex("login🔑") | filters.command("login")) , group=4)
@@ -49,13 +53,24 @@ async def login_handler(c: Client, m: Message):
 @StreamBot.on_message((filters.private) & (filters.document | filters.video | filters.audio | filters.photo) , group=4)
 async def private_receive_handler(c: Client, m: Message):
     USER_ID = m.chat.id
-    if USER_ID in WAIT_LIST.keys():
-        ISWAIT = WAIT_LIST.get(USER_ID)
+    DATE_LIST = {}
+    tz = pytz.timezone('Asia/Kolkata')
+    today = date.today()
+    if USER_ID in FREE_USER.keys():
+        DATE_LIST = FREE_USER.get(USER_ID)
+        if today in DATE_LIST.keys():
+            DAILY_LIMIT = DATE_LIST.get(today)
+        else:
+            DATE_LIST[today] = 0
+            DAILY_LIMIT = DATE_LIST.get(today)
+            
     else:
-        WAIT_LIST[USER_ID] = False
-        ISWAIT = WAIT_LIST.get(USER_ID)
-    if USER_ID not in Var.PREMIUM_USERS and ISWAIT == True:
-        return await m.reply_text(f"<b>Hey {m.from_user.mention}, Wait for {str(Var.WAIT_TIME)} seconds to use me ! \n\nYou are a free user, if you need to get highspeed downloading links, you need to take premium subscription.\n\nPay ₹30/- to the UPI ID sharundas123@ybl and send a screenshot to @kwicadmin in telegram.</b>")
+        DATE_LIST[today] = 0
+        FREE_USER[USER_ID] = DATE_LIST
+        DATE_LIST = FREE_USER.get(USER_ID)
+        DAILY_LIMIT = DATE_LIST.get(today)
+    if USER_ID not in Var.PREMIUM_USERS and DAILY_LIMIT == 2:
+        return await m.reply_text(f"<b>Hey {m.from_user.mention}, Wait for tommorow to use me, You have exceeded my free daily usage limit ! \n\nYou are a free user, if you need to get highspeed downloading links, you need to take premium subscription.\n\nPay ₹30/- to the UPI ID sharundas123@ybl and send a screenshot to @kwicadmin in telegram.</b>")
     if MY_PASS:
         check_pass = await pass_db.get_user_pass(m.chat.id)
         if check_pass== None:
@@ -133,9 +148,9 @@ async def private_receive_handler(c: Client, m: Message):
                                                 InlineKeyboardButton('⚡ ᴅᴏᴡɴʟᴏᴀᴅ ⚡', url=online_link)]]) #Download Link
         )
         if USER_ID not in Var.PREMIUM_USERS:
-            WAIT_LIST[USER_ID] = True
-            await asyncio.sleep(Var.WAIT_TIME)
-            WAIT_LIST[USER_ID] = False
+            DAILY_LIMIT += 1
+            DATE_LIST[today] = DAILY_LIMIT
+            FREE_USER[USER_ID] = DATE_LIST
     except FloodWait as e:
         print(f"Sleeping for {str(e.x)}s")
         await asyncio.sleep(e.x)
