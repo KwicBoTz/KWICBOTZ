@@ -1,7 +1,6 @@
 #(c) Adarsh-Goel
 import os
 import asyncio
-import time
 from asyncio import TimeoutError
 from Adarsh.bot import StreamBot
 from Adarsh.utils.database import Database
@@ -135,7 +134,7 @@ async def private_receive_handler(c: Client, m: Message):
         )
         if USER_ID not in Var.PREMIUM_USERS:
             WAIT_LIST[USER_ID] = True
-            time.sleep(Var.WAIT_TIME)
+            await asyncio.sleep(Var.WAIT_TIME)
             WAIT_LIST[USER_ID] = False
     except FloodWait as e:
         print(f"Sleeping for {str(e.x)}s")
