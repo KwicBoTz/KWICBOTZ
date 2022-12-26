@@ -49,8 +49,7 @@ async def login_handler(c: Client, m: Message):
 @StreamBot.on_message((filters.private) & (filters.document | filters.video | filters.audio | filters.photo) , group=4)
 async def private_receive_handler(c: Client, m: Message):
     USER_ID = m.chat.id
-    key = USER_ID
-    if key in WAIT_LIST.keys():
+    if USER_ID in WAIT_LIST.keys():
         ISWAIT = WAIT_LIST.get(USER_ID)
     else:
         WAIT_LIST[USER_ID] = False
